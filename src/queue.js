@@ -20,6 +20,20 @@ function sendToQueue(queue, message) {
     .catch(err => console.log(err))
 }
 
+async function publishInExchange(exchange, routingKey, message) {
+
+  try {
+    connect().then(channel => {
+      channel.assertExchange(exchange, 'direct', { durable: true });
+      channel.publish(exchange, routingKey, Buffer.from(JSON.stringify(message)));
+    })
+
+
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+
 function consume(queue, callback) {
   connect()
     .then(channel => createQueue(channel, queue))
@@ -29,5 +43,6 @@ function consume(queue, callback) {
 
 module.exports = {
   sendToQueue,
+  publishInExchange,
   consume
 }
